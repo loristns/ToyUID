@@ -26,69 +26,61 @@ class ToyUID:
         random.shuffle(wordlist)
         wordlen = len(wordlist)
 
-        self.word = wordlist[random.randrange(wordlen)] #get a totally random word
+        word = wordlist[random.randrange(wordlen)] #get a totally random word
 
         #get some computer's data like os name, processor architecture and mac adress
-        self.arch = platform.machine()
-        self.os = platform.platform()
-        self.mac = str(domain).encode('utf-8')
-        self.mac = hashlib.sha224(self.mac).hexdigest() #hash mac address for better privacy
+        arch = platform.machine()
+        os = platform.platform()
+        mac = str(domain).encode('utf-8')
+        mac = hashlib.sha1(mac).hexdigest() #hash mac address for better privacy
 
 
         #get computer performance estimation with loading of a big python standard module : tkinter
         performance = timeit.Timer("while i != 11: i = random.randrange(1000000)", 'i = 0; import random')
-        self.timeget = performance.timeit()
+        timeget = performance.timeit()
 
         #get timestamp2 at the end
         time.sleep(randomnumber4)
-        self.timestamp2 = time.time()
+        timestamp2 = time.time()
 
         #now create ToyUID
 
-        self.UIDlist = [str(timestamp1),
+        UIDlist = [str(timestamp1),
                         str(randomnumber1),
                         str(randomnumber2),
                         str(randomnumber3),
-                        self.word,
-                        self.arch,
-                        self.os,
-                        self.mac,
-                        str(self.timeget),
-                        str(self.timestamp2),
+                        word,
+                        arch,
+                        os,
+                        mac,
+                        str(timeget),
+                        str(timestamp2),
                         ]
 
-        random.shuffle(self.UIDlist) #randomly change the list's order
+        random.shuffle(UIDlist) #randomly change the list's order
 
         #hash the ToyUID with an random algorithm
 
-        self.hash_algorithm = random.choice(list(hashlib.algorithms_available))
-        hashing = hashlib.new(self.hash_algorithm)
+        self.algorithm = random.choice(list(hashlib.algorithms_available))
+        hashing = hashlib.new(self.algorithm)
 
-        for element in self.UIDlist:
+        for element in UIDlist:
             element = element + random.choice("azertyuiopqsdfghjklmwxcvbn1234567890") #add a random salt
             element = element.encode('utf-8')
             hashing.update(element)
 
-        self.UIDhash = hashing.hexdigest()[:35] #get 35 first caracter of the hash
+        self.str = hashing.hexdigest()[:35] #get 35 first caracter of the hash
+        self.bytes = bytes(self.str, 'utf-8') #get bytes
+        self.int = int(self.str, 16)
 
     def __bytes__(self):
         """send a bytes ToyUID"""
-        return bytes(self.UIDhash, 'utf-8')
+        return self.bytes
 
     def __str__(self):
         """send a str ToyUID"""
-        return self.UIDhash
+        return self.str
 
     def __int__(self):
         """send a int ToyUID"""
-        return int(self.UIDhash, 16)
-
-    @property
-    def generate_list(self):
-        """send the parameter's list used for generating ToyUID"""
-        return self.UIDlist
-
-    @property
-    def algorithm(self):
-        """send the algorithm name selected"""
-        return self.hash_algorithm
+        return self.int
