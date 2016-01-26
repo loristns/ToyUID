@@ -4,6 +4,7 @@ import time
 from uuid import getnode
 import timeit
 import hashlib
+import re
 
 class ToyUID:
 
@@ -11,8 +12,8 @@ class ToyUID:
 
         timestamp1 = time.time()
 
-        randomnumber1 = random.randrange(1000000000000000000)
-        randomnumber2 = random.randrange(randomnumber1) #randomnumber2 is equal of inferior to randomnumber1
+        randomnumber1 = random.randrange(10000000000000000000000000000000000000000000000)
+        randomnumber2 = random.randrange(randomnumber1 * randomnumber1)
         randomnumber3 = random.randrange(randomnumber1 * randomnumber2)
         randomnumber4 = random.uniform(1, 100) / 50 #only used to get timestamp2
 
@@ -35,7 +36,7 @@ class ToyUID:
         mac = hashlib.sha1(mac).hexdigest() #hash mac address for better privacy
 
 
-        #get computer performance estimation with loading of a big python standard module : tkinter
+        #get a computer performance estimation randomized
         performance = timeit.Timer("while i != 11: i = random.randrange(1000000)", 'i = 0; import random')
         timeget = performance.timeit()
 
@@ -61,15 +62,16 @@ class ToyUID:
 
         #hash the ToyUID with an random algorithm
 
-        self.algorithm = random.choice(list(hashlib.algorithms_available))
-        hashing = hashlib.new(self.algorithm)
+        hashing = hashlib.sha1()
+        check = hashlib.md5()
 
         for element in UIDlist:
             element = element + random.choice("azertyuiopqsdfghjklmwxcvbn1234567890") #add a random salt
             element = element.encode('utf-8')
             hashing.update(element)
+            check.update(element)
 
-        self.str = hashing.hexdigest()[:35] #get 35 first caracter of the hash
+        self.str = hashing.hexdigest() + check.hexdigest()
         self.bytes = bytes(self.str, 'utf-8') #get bytes
         self.int = int(self.str, 16)
 
@@ -84,3 +86,14 @@ class ToyUID:
     def __int__(self):
         """send a int ToyUID"""
         return self.int
+
+    @property
+    def normalized(self):
+
+        normalized_list = re.findall('....?', self.str) #get the normalized list
+        separated = 'TOYUID'
+
+        for element in normalized_list: #from the list create a string which separate element by -
+            separated = separated + '-' + element
+
+        return separated
